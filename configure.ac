@@ -161,6 +161,24 @@ AS_IF([test "x$enable_ubuntu" != xno], [
 ])
 AM_CONDITIONAL([ENABLE_UBUNTU], [test "x$enable_ubuntu" != xno])
 
+# Check for systemd
+PKG_PROG_PKG_CONFIG
+AC_MSG_CHECKING([systemd user unit directory])
+AC_ARG_ENABLE([systemd],
+              [AC_HELP_STRING([--enable-systemd],
+                              [install a systemd user service file])],
+              [enable_systemd=$enableval],
+              [enable_systemd=check])
+AC_SUBST([systemduserunitdir], [$($PKG_CONFIG --variable=systemduserunitdir systemd)])
+AS_IF([test -n "$systemduserunitdir" -a "x$enable_systemd" != xno], [
+	enable_systemd=yes
+	AC_MSG_RESULT([yes, $systemduserunitdir])
+], [
+	enable_systemd=no
+	AC_MSG_RESULT([no])
+])
+AM_CONDITIONAL([ENABLE_SYSTEMD], [test "x$enable_systemd" != xno])
+
 # Checks for header files.
 AC_CHECK_HEADERS([locale.h stdint.h stdlib.h string.h unistd.h signal.h])
 
@@ -200,4 +218,5 @@ echo "
 
     GUI:		${enable_gui}
     Ubuntu icons:	${enable_ubuntu}
+    systemd support:	${enable_systemd}: ${systemduserunitdir}
 "
